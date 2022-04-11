@@ -1,6 +1,7 @@
 package com.example.treasurehunt.ui.login
 
 import android.app.Activity
+import android.content.Intent
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
@@ -15,11 +16,12 @@ import android.widget.Toast
 import com.example.treasurehunt.databinding.ActivityLoginBinding
 
 import com.example.treasurehunt.R
+import com.example.treasurehunt.activity.MapsActivity
 
 class LoginActivity : AppCompatActivity() {
-
     private lateinit var loginViewModel: LoginViewModel
     private lateinit var binding: ActivityLoginBinding
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,6 +46,7 @@ class LoginActivity : AppCompatActivity() {
             if (loginState.usernameError != null) {
                 username.error = getString(loginState.usernameError)
             }
+
             if (loginState.passwordError != null) {
                 password.error = getString(loginState.passwordError)
             }
@@ -101,7 +104,8 @@ class LoginActivity : AppCompatActivity() {
     private fun updateUiWithUser(model: LoggedInUserView) {
         val welcome = getString(R.string.welcome)
         val displayName = model.displayName
-        // TODO : initiate successful logged in experience
+        val intent = Intent(this, MapsActivity::class.java)
+        startActivity(intent)
         Toast.makeText(
             applicationContext,
             "$welcome $displayName",
