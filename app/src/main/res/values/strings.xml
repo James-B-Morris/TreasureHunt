@@ -1,19 +1,22 @@
 <resources>
     <string name="app_name">TreasureHunt</string>
+    <string name="title_activity_login">LoginActivity</string>
     <string name="title_activity_maps">MapsActivity</string>
     <string name="title_activity_settings">SettingsActivity</string>
 
-    <!-- Strings related to login -->
-    <string name="prompt_email">Username Or Email</string>
+    ////// Strings related to login //////
+    <string name="prompt_email">Email</string>
     <string name="prompt_password">Password</string>
     <string name="action_sign_in">Sign in or register</string>
     <string name="action_sign_in_short">Sign in</string>
+    <string name="action_show_password">Show Password</string>
     <string name="welcome">"Welcome !"</string>
     <string name="invalid_email">Please use a valid email.</string>
     <string name="invalid_password_length">Password must be at least 8 characters.</string>
     <string name="invalid_username">Not a valid username.</string>
-    <string name="login_failed">"One or more of the details you provided were incorrect."</string>
-
+    <string name="invalid_missing">You failed to provide information for one or more fields</string>
+    <string name="login_failed">One or more of your account details were incorrect</string>
+    <string name="login_forgotten">Forgotten your login details?</string>
 
     <!-- Preference Titles -->
     <string name="messages_header">Messages</string>
@@ -29,4 +32,35 @@
     <string name="attachment_summary_on">Automatically download attachments for incoming emails
     </string>
     <string name="attachment_summary_off">Only download attachments when manually requested</string>
+
+    ////// LOG TAGS //////
+    <string name="log_main">Main.Info</string>
+    <string name="log_login">Login.Info</string>
+    <string name="log_register">Register.Info</string>
+    <string name="log_points_of_interest">PointsOfInterest.Info</string>
+    <string name="log_map">Map.Info</string>
+    <string name="log_map_loc">LocLatLocation</string>
+    <string name="log_settings">Settings.Info</string>
+
+    ////// STATUS TAGS //////
+    <string name="log_created">in onCreate</string>
+    <string name="log_started">in onStart</string>
+    <string name="log_resume">in onResume</string>
+    <string name="log_pause">in onPause</string>
+    <string name="log_stop">in onStop</string>
+    <string name="log_destroy">in onDestroy</string>
+    <string name="log_restart">in onRestart</string>
+
+    ////// LOGS //////
+    <string name="log_user">User </string>
+    <string name="log_current_login"> currently logged in</string>
+    <string name="log_login_success">signInWithEmail:Success</string>
+    <string name="log_login_failure">signInWithEmail:failure</string>
+    <string name="log_register_user_success">DocumentSnapshot added with ID: </string>
+    <string name="log_register_user_failure">Error adding document: </string>
+    <string name="log_register_success">createUserWithEmail:success</string>
+    <string name="log_register_failure">createUserWithEmail:failure</string>
+    <string name="log_return">return</string>
+    <string name="log_document_error">Error getting documents</string>
+
 </resources>

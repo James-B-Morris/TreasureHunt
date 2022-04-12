@@ -15,13 +15,12 @@ import com.example.treasurehunt.databinding.ActivityMapsBinding
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var mMap: GoogleMap
-private lateinit var binding: ActivityMapsBinding
+    private lateinit var binding: ActivityMapsBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-     binding = ActivityMapsBinding.inflate(layoutInflater)
-     setContentView(binding.root)
+        binding = ActivityMapsBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = supportFragmentManager
