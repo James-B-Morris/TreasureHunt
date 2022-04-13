@@ -76,6 +76,19 @@
         app:layout_constraintTop_toBottomOf="@+id/showPasswordCheckBox"
         app:layout_constraintVertical_bias="0.055" />
 
+    <Button
+        android:id="@+id/login2"
+        android:layout_width="300dp"
+        android:layout_height="60dp"
+        android:onClick="goToRegister"
+        android:text="@string/action_sign_in_short"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.504"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/forgottenPasswordTxt"
+        app:layout_constraintVertical_bias="0.201" />
+
     <CheckBox
         android:id="@+id/showPasswordCheckBox"
         android:layout_width="150dp"
