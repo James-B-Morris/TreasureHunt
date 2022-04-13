@@ -4,7 +4,14 @@
     <string name="title_activity_maps">MapsActivity</string>
     <string name="title_activity_settings">SettingsActivity</string>
 
-    ////// Strings related to login //////
+    ////// DATABASE PATH STRINGS //////
+    <string name="path_users">Users</string>
+
+    <string name="db_users_admin">admin</string>
+    <string name="db_users_email">email</string>
+    <string name="db_users_name">username</string>
+
+    ////// STRINGS RELATED TO LOGIN //////
     <string name="prompt_email">Email</string>
     <string name="prompt_password">Password</string>
     <string name="action_sign_in">Sign in or register</string>
@@ -12,11 +19,20 @@
     <string name="action_show_password">Show Password</string>
     <string name="welcome">"Welcome !"</string>
     <string name="invalid_email">Please use a valid email.</string>
-    <string name="invalid_password_length">Password must be at least 8 characters.</string>
-    <string name="invalid_username">Not a valid username.</string>
     <string name="invalid_missing">You failed to provide information for one or more fields</string>
     <string name="login_failed">One or more of your account details were incorrect</string>
     <string name="login_forgotten">Forgotten your login details?</string>
+
+    //////  STRINGS RELATED TO REGISTERING A NEW ACCOUNT //////
+    <string name="prompt_display_name">Display Name</string>
+    <string name="prompt_password_confirmation">Confirm Password</string>
+    <string name="ui_title_register">Account Registration</string>
+    <string name="action_create_account">Create Account</string>
+
+    <string name="invalid_username">"Please enter a username between 3 and 12 characters"</string>
+    <string name="invalid_password_length">Please make your password at least 8 characters long</string>
+    <string name="invalid_passwords_dont_match">Please make sure "confirm Password" matches "Password"</string>
+    <string name="registration_failed">This email is linked to an existing account. Please sign in or reset your password.</string>
 
     <!-- Preference Titles -->
     <string name="messages_header">Messages</string>
@@ -63,4 +79,9 @@
     <string name="log_return">return</string>
     <string name="log_document_error">Error getting documents</string>
 
+    ////// STRINGS RELATED TO TOOLBAR //////
+    <string name="action_logout">LogOut</string>
+    <string name="action_refresh">Refresh</string>
+    <string name="action_profile">Profile</string>
+    <string name="action_settings">Settings</string>
 </resources>

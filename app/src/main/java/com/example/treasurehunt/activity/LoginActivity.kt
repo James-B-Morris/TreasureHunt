@@ -90,6 +90,11 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
+    fun goToRegister(view : View) {
+        val intent = Intent(this, RegisterActivity::class.java)
+        startActivity(intent)
+    }
+
     private fun displayMessage(view : View, msg : String) {
         val snackbar = Snackbar.make(view, msg, Snackbar.LENGTH_LONG)
         snackbar.show()
