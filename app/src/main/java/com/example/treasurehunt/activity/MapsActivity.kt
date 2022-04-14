@@ -41,7 +41,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private var handler: Handler = Handler()
     private var runnable: Runnable? = null
-    private var delay: Long = 2000
+    private val delay: Long = 2000
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,17 +51,24 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         initMap()
     }
 
-    override fun onResume() {
-        handler.postDelayed(Runnable {
-            runnable?.let { handler.postDelayed(it, delay) }
-            getLastLocation()
-        }.also { runnable = it }, delay)
-        super.onResume()
-    }
+////// FORCES THE CAMERA TO FOLLOW THE USER'S CURRENT LOCATION //////
+//    override fun onResume() {
+//        handler.postDelayed(Runnable {
+//            runnable?.let { handler.postDelayed(it, delay) }
+//            getLastLocation()
+//        }.also { runnable = it }, delay)
+//        super.onResume()
+//    }
+//
+//    override fun onPause() {
+//        super.onPause()
+//        runnable?.let { handler.removeCallbacks(it) } //stop handler when activity not visible super.onPause();
+//    }
 
-    override fun onPause() {
-        super.onPause()
-        runnable?.let { handler.removeCallbacks(it) } //stop handler when activity not visible super.onPause();
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+
+        //outState.putInt("points", points)
     }
 
     ////// TOOLBAR STUFF //////
@@ -111,6 +118,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
+        mMap.uiSettings.isZoomControlsEnabled = true
+        mMap.uiSettings.isCompassEnabled = true
+        mMap.uiSettings.isMyLocationButtonEnabled = true
+        mMap.setMaxZoomPreference(18F)
+        mMap.setMinZoomPreference(15F)
 
         getLastLocation()
         mMap.animateCamera(CameraUpdateFactory.zoomTo(15F))
@@ -118,9 +130,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         //handle my location FAB
         val fabMy: View = findViewById(R.id.locFab)
         fabMy.setOnClickListener { view ->
-            val locSnack = Snackbar.make(findViewById(R.id.map), getString(R.string.map_location_switch),
-                Snackbar.LENGTH_LONG)
-            locSnack.show()
             getLastLocation()
             mMap.animateCamera(CameraUpdateFactory.zoomTo(15F))
         }
