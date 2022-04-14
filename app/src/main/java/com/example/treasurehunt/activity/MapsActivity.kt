@@ -7,6 +7,7 @@ import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationManager
 import android.os.Bundle
+import android.os.Handler
 import android.os.Looper
 import android.provider.Settings
 import android.util.Log
@@ -38,6 +39,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     // gives access to the device's location
     private lateinit var mFusedLocationClient: FusedLocationProviderClient
 
+    private var handler: Handler = Handler()
+    private var runnable: Runnable? = null
+    private var delay: Long = 2000
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_maps)
@@ -46,16 +51,24 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         initMap()
     }
 
+    override fun onResume() {
+        handler.postDelayed(Runnable {
+            runnable?.let { handler.postDelayed(it, delay) }
+            getLastLocation()
+        }.also { runnable = it }, delay)
+        super.onResume()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        runnable?.let { handler.removeCallbacks(it) } //stop handler when activity not visible super.onPause();
+    }
+
+    ////// TOOLBAR STUFF //////
     private fun initToolbar() {
         val toolbar = findViewById<Toolbar>(R.id.mapToolBar)
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-    }
-
-    private fun initMap() {
-        val mapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
-        mapFragment!!.getMapAsync(this)
-        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -68,8 +81,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
         when (item.itemId) {
             R.id.refresh -> {
-                //val sb = Snackbar.make(view, getString(R.string.xml_refresh), Snackbar.LENGTH_LONG)
-                //sb.show()
+                onCreate(null)
                 return true
             }
             R.id.action_logout -> {
@@ -90,13 +102,27 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         return super.onOptionsItemSelected(item)
     }
 
+    ////// MAP STUFF //////
+    private fun initMap() {
+        val mapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
+        mapFragment!!.getMapAsync(this)
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+    }
+
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
+
+        getLastLocation()
+        mMap.animateCamera(CameraUpdateFactory.zoomTo(15F))
 
         //handle my location FAB
         val fabMy: View = findViewById(R.id.locFab)
         fabMy.setOnClickListener { view ->
+            val locSnack = Snackbar.make(findViewById(R.id.map), getString(R.string.map_location_switch),
+                Snackbar.LENGTH_LONG)
+            locSnack.show()
             getLastLocation()
+            mMap.animateCamera(CameraUpdateFactory.zoomTo(15F))
         }
     }
 
@@ -128,7 +154,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
                     //update camera
                     mMap.animateCamera(CameraUpdateFactory.newLatLng(lastLoc))
-                    mMap.animateCamera(CameraUpdateFactory.zoomTo(15F))
+                    //mMap.animateCamera(CameraUpdateFactory.zoomTo(15F))
                     mMap.addMarker(MarkerOptions().position(lastLoc)
                         .title(getString(R.string.map_current_location)))
                 }

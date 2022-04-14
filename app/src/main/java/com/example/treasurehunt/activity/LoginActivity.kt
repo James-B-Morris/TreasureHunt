@@ -20,6 +20,7 @@ class LoginActivity : AppCompatActivity() {
 
     // Authentication Vars
     private var mAuth = FirebaseAuth.getInstance()
+    private var currentUser = mAuth.currentUser
 
     // login deets
     private val emailPattern = "[a-zA-z0-9._-]+@[a-z]+\\.+[a-z]+"
@@ -35,6 +36,20 @@ class LoginActivity : AppCompatActivity() {
         emailText = findViewById(R.id.login_email)
         passText = findViewById(R.id.login_password)
         loginBtn = findViewById(R.id.login)
+    }
+
+    override fun onStart() {
+        super.onStart()
+        Log.i(getString(R.string.log_login), getString(R.string.log_started))
+        val intent = Intent(this, MapsActivity::class.java)
+
+        if (currentUser != null) {
+            Log.i(getString(R.string.log_login),
+                (getString(R.string.log_user)
+                        + currentUser!!.email.toString()
+                        + getString(R.string.log_current_login)))
+            startActivity(intent)
+        }
     }
 
     /**

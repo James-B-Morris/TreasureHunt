@@ -55,13 +55,10 @@
     <string name="attachment_summary_off">Only download attachments when manually requested</string>
 
     ////// LOG TAGS //////
-    <string name="log_main">Main.Info</string>
     <string name="log_login">Login.Info</string>
     <string name="log_register">Register.Info</string>
-    <string name="log_points_of_interest">PointsOfInterest.Info</string>
     <string name="log_map">Map.Info</string>
     <string name="log_map_loc">LocLatLocation</string>
-    <string name="log_settings">Settings.Info</string>
 
     ////// STATUS TAGS //////
     <string name="log_created">in onCreate</string>
