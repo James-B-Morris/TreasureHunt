@@ -7,6 +7,7 @@ import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
@@ -56,6 +57,33 @@ class RegisterActivity : AppCompatActivity() {
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.layout_toolbar_register, menu)
         return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        val view = findViewById<View>(R.id.registerToolBar)
+
+        when (item.itemId) {
+            R.id.refresh -> {
+                //val sb = Snackbar.make(view, getString(R.string.xml_refresh), Snackbar.LENGTH_LONG)
+                //sb.show()
+                return true
+            }
+            R.id.action_logout -> {
+                FirebaseAuth.getInstance().signOut()
+                val intent = Intent(this, LoginActivity::class.java)
+                startActivity(intent)
+                return true
+            }
+            R.id.profile -> {
+                //val intent = Intent(this, SettingsActivity::class.java)
+                //startActivity(intent)
+            }
+            R.id.settingsBtn -> {
+                //val intent = Intent(this, SettingsActivity::class.java)
+                //startActivity(intent)
+            }
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     fun registerClick(view : View) {
