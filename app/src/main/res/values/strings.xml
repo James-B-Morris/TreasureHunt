@@ -34,6 +34,11 @@
     <string name="invalid_passwords_dont_match">Please make sure "confirm Password" matches "Password"</string>
     <string name="registration_failed">This email is linked to an existing account. Please sign in or reset your password.</string>
 
+    ////// STRINGS RELATED TO THE MAP //////
+    <string name="map_current_location">Current Location</string>
+    <string name="map_location_switch">Location Switch</string>
+    <string name="description_location">Move the camera to your current location.</string>
+
     <!-- Preference Titles -->
     <string name="messages_header">Messages</string>
     <string name="sync_header">Sync</string>
@@ -84,4 +89,5 @@
     <string name="action_refresh">Refresh</string>
     <string name="action_profile">Profile</string>
     <string name="action_settings">Settings</string>
+
 </resources>

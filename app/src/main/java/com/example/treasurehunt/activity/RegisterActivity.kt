@@ -43,15 +43,19 @@ class RegisterActivity : AppCompatActivity() {
         setContentView(R.layout.register_activity)
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
 
-        val toolbar = findViewById<Toolbar>(R.id.registerToolBar)
-        setSupportActionBar(toolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        initToolbar()
 
         usernameText = findViewById(R.id.register_displayName)
         emailText = findViewById(R.id.register_email)
         passText = findViewById(R.id.register_password)
         newPassText = findViewById(R.id.register_confirm_password)
         registerBtn = findViewById(R.id.register)
+    }
+
+    private fun initToolbar() {
+        val toolbar = findViewById<Toolbar>(R.id.registerToolBar)
+        setSupportActionBar(toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

@@ -2,6 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.treasurehunt" >
 
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.INTERNET"/>
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -11,7 +15,7 @@
         android:theme="@style/Theme.TreasureHunt" >
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyAyvDMY9-gdq-ENxsKQP0L2ESfpC6BxeEI" />
+            android:value="AIzaSyCnCacQRn0N-IQ6EouE1OAQX8lfGsV-N5A" />
         <activity
             android:name=".activity.MapsActivity"
             android:exported="false"

@@ -1,36 +1,55 @@
 package com.example.treasurehunt.activity
 
-import androidx.appcompat.app.AppCompatActivity
+import android.Manifest
+import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.location.Location
+import android.location.LocationManager
 import android.os.Bundle
+import android.os.Looper
+import android.provider.Settings
 import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
+import android.view.View
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
+import androidx.core.app.ActivityCompat
 import com.example.treasurehunt.R
-
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationResult
+import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
-import com.example.treasurehunt.databinding.ActivityMapsBinding
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationServices
-import com.google.firebase.firestore.GeoPoint
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
+import com.google.android.material.snackbar.Snackbar
+import com.google.firebase.auth.FirebaseAuth
+
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
+    // Map Object
     private lateinit var mMap: GoogleMap
-    private lateinit var binding: ActivityMapsBinding
+    // gives access to the device's location
     private lateinit var mFusedLocationClient: FusedLocationProviderClient
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityMapsBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+        setContentView(R.layout.activity_maps)
 
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+        initToolbar()
         initMap()
+    }
+
+    private fun initToolbar() {
+        val toolbar = findViewById<Toolbar>(R.id.mapToolBar)
+        setSupportActionBar(toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
     private fun initMap() {
@@ -39,22 +58,137 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
     }
 
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.layout_toolbar, menu)
+        return super.onCreateOptionsMenu(menu)
+    }
 
-    /**
-     * Manipulates the map once available.
-     * This callback is triggered when the map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera. In this case,
-     * we just add a marker near Sydney, Australia.
-     * If Google Play services is not installed on the device, the user will be prompted to install
-     * it inside the SupportMapFragment. This method will only be triggered once the user has
-     * installed Google Play services and returned to the app.
-     */
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        val view = findViewById<View>(R.id.mapToolBar)
+
+        when (item.itemId) {
+            R.id.refresh -> {
+                //val sb = Snackbar.make(view, getString(R.string.xml_refresh), Snackbar.LENGTH_LONG)
+                //sb.show()
+                return true
+            }
+            R.id.action_logout -> {
+                FirebaseAuth.getInstance().signOut()
+                val intent = Intent(this, LoginActivity::class.java)
+                startActivity(intent)
+                return true
+            }
+            R.id.profile -> {
+                //val intent = Intent(this, SettingsActivity::class.java)
+                //startActivity(intent)
+            }
+            R.id.settingsBtn -> {
+                //val intent = Intent(this, SettingsActivity::class.java)
+                //startActivity(intent)
+            }
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
 
-        // Add a marker in Sydney and move the camera
-        val sydney = LatLng(-34.0, 151.0)
-        mMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
+        //handle my location FAB
+        val fabMy: View = findViewById(R.id.locFab)
+        fabMy.setOnClickListener { view ->
+            getLastLocation()
+        }
+    }
+
+    private fun getLastLocation() {
+        if(isLocationEnabled()) {
+            //checking location permission
+            if (ActivityCompat.checkSelfPermission(this,
+                    Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
+                //request permission
+                ActivityCompat.requestPermissions(this,
+                    arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 42)
+                return
+            }
+
+            //once the last location is acquired
+            mFusedLocationClient.lastLocation.addOnCompleteListener(this) { task ->
+                val location: Location? = task.result
+                if (location == null) {
+                    //if it couldn't be aquired, get some new location data
+                    requestNewLocationData()
+                }
+                else {
+                    val lat = location.latitude
+                    val long = location.longitude
+
+                    Log.i(getString(R.string.log_map_loc), "$lat & $long")
+
+                    val lastLoc = LatLng(lat, long)
+
+                    //update camera
+                    mMap.animateCamera(CameraUpdateFactory.newLatLng(lastLoc))
+                    mMap.animateCamera(CameraUpdateFactory.zoomTo(15F))
+                    mMap.addMarker(MarkerOptions().position(lastLoc)
+                        .title(getString(R.string.map_current_location)))
+                }
+            }
+            // couldn't get location, so go to Settings (may be deprecated)
+        } else {
+            val mRootView = findViewById<View>(R.id.map)
+            val locSnack = Snackbar.make(mRootView, getString(R.string.map_location_switch),
+                Snackbar.LENGTH_LONG)
+            locSnack.show()
+
+            val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
+            startActivity(intent)
+        }
+    }
+
+    // Request a new location
+    private fun requestNewLocationData() {
+        //parameters for location
+        val mLocationRequest = com.google.android.gms.location.LocationRequest.create().apply {
+            interval = 100
+            fastestInterval = 50
+            priority = com.google.android.gms.location.LocationRequest.PRIORITY_HIGH_ACCURACY
+            maxWaitTime= 100
+        }
+
+        //checking location permission
+        if (ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            //request permission
+            ActivityCompat.requestPermissions(this,
+                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 42)
+            return
+        }
+
+        //update the location client
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+        //add a callback so that the location is repeatedly updated according to paremeters
+        mFusedLocationClient.requestLocationUpdates(mLocationRequest,
+            mLocationCallback, Looper.myLooper()!!
+        )
+    }
+
+    //callback for repeatedly getting location
+    private val mLocationCallback = object : LocationCallback() {
+        override fun onLocationResult(locationResult: LocationResult) {
+            val mLastLocation: Location = locationResult.lastLocation
+            val lat = mLastLocation.latitude
+            val long = mLastLocation.longitude
+
+            val lastLoc = LatLng(lat, long)
+            Log.i(getString(R.string.log_map_loc), "$lat & $long")
+        }
+    }
+
+    // check whether location is enabled
+    private fun isLocationEnabled():Boolean {
+        val locationManager: LocationManager =
+            getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) ||
+                locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
     }
 }
