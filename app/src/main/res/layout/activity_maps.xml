@@ -33,7 +33,7 @@
             android:id="@+id/locFab"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="bottom|right"
+            android:layout_gravity="top|right"
             android:layout_margin="15dp"
             android:clickable="true"
             android:contentDescription="@string/description_location"

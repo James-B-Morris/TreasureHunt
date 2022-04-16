@@ -36,6 +36,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     // Map Object
     private lateinit var mMap: GoogleMap
+
     // gives access to the device's location
     private lateinit var mFusedLocationClient: FusedLocationProviderClient
 
@@ -51,19 +52,20 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         initMap()
     }
 
-////// FORCES THE CAMERA TO FOLLOW THE USER'S CURRENT LOCATION //////
-//    override fun onResume() {
-//        handler.postDelayed(Runnable {
-//            runnable?.let { handler.postDelayed(it, delay) }
-//            getLastLocation()
-//        }.also { runnable = it }, delay)
-//        super.onResume()
-//    }
-//
-//    override fun onPause() {
-//        super.onPause()
-//        runnable?.let { handler.removeCallbacks(it) } //stop handler when activity not visible super.onPause();
-//    }
+    ////// FORCES THE CAMERA TO FOLLOW THE USER'S CURRENT LOCATION //////
+    override fun onResume() {
+        super.onResume()
+        handler.postDelayed(Runnable {
+            runnable?.let { handler.postDelayed(it, delay) }
+            userCursor()
+            Log.i(getString(R.string.log_login), getString(R.string.log_user_moved))
+        }.also { runnable = it }, delay)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        runnable?.let { handler.removeCallbacks(it) } //stop handler when activity not visible super.onPause();
+    }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
@@ -117,25 +119,54 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
+        var lastLoc = getLastLocation()
+
         mMap = googleMap
         mMap.uiSettings.isZoomControlsEnabled = true
         mMap.uiSettings.isCompassEnabled = true
         mMap.uiSettings.isMyLocationButtonEnabled = true
-        mMap.setMaxZoomPreference(18F)
+        //mMap.setMaxZoomPreference(18F)
         mMap.setMinZoomPreference(15F)
 
-        getLastLocation()
-        mMap.animateCamera(CameraUpdateFactory.zoomTo(15F))
+
+        if (lastLoc != null) {
+            mMap.animateCamera(CameraUpdateFactory.newLatLng(lastLoc))
+            mMap.animateCamera(CameraUpdateFactory.zoomTo(15F))
+        }
 
         //handle my location FAB
         val fabMy: View = findViewById(R.id.locFab)
         fabMy.setOnClickListener { view ->
-            getLastLocation()
-            mMap.animateCamera(CameraUpdateFactory.zoomTo(15F))
+            lastLoc = getLastLocation()
+            if (lastLoc != null) {
+                mMap.animateCamera(CameraUpdateFactory.newLatLng(lastLoc!!))
+                mMap.animateCamera(CameraUpdateFactory.zoomTo(15F))
+            }
         }
     }
 
-    private fun getLastLocation() {
+    private fun userCursor() {
+        val lastLoc = getLastLocation()
+        //mMap.clear()
+
+        if (lastLoc != null) {
+            mMap.clear()
+            //update camera
+            //mMap.animateCamera(CameraUpdateFactory.newLatLng(lastLoc))
+            //mMap.animateCamera(CameraUpdateFactory.zoomTo(15F))
+            mMap.addMarker(
+                MarkerOptions().position(lastLoc)
+                    .title(getString(R.string.map_current_location))
+            )
+        }
+
+
+    }
+
+    private fun getLastLocation() : LatLng? {
+        var lastLoc :LatLng?
+        lastLoc = null
+
         if(isLocationEnabled()) {
             //checking location permission
             if (ActivityCompat.checkSelfPermission(this,
@@ -143,14 +174,14 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 //request permission
                 ActivityCompat.requestPermissions(this,
                     arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 42)
-                return
+                return lastLoc
             }
 
             //once the last location is acquired
             mFusedLocationClient.lastLocation.addOnCompleteListener(this) { task ->
                 val location: Location? = task.result
                 if (location == null) {
-                    //if it couldn't be aquired, get some new location data
+                    //if it couldn't be acquired, get some new location data
                     requestNewLocationData()
                 }
                 else {
@@ -159,15 +190,16 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
                     Log.i(getString(R.string.log_map_loc), "$lat & $long")
 
-                    val lastLoc = LatLng(lat, long)
-
-                    //update camera
-                    mMap.animateCamera(CameraUpdateFactory.newLatLng(lastLoc))
+                    lastLoc = LatLng(lat, long)
+                    mMap.animateCamera(CameraUpdateFactory.newLatLng(lastLoc!!))
                     //mMap.animateCamera(CameraUpdateFactory.zoomTo(15F))
-                    mMap.addMarker(MarkerOptions().position(lastLoc)
-                        .title(getString(R.string.map_current_location)))
+                    mMap.addMarker(
+                        MarkerOptions().position(lastLoc!!)
+                            .title(getString(R.string.map_current_location))
+                    )
                 }
             }
+            return lastLoc
             // couldn't get location, so go to Settings (may be deprecated)
         } else {
             val mRootView = findViewById<View>(R.id.map)
@@ -177,6 +209,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
             val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
             startActivity(intent)
+            return lastLoc
         }
     }
 

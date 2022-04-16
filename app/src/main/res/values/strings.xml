@@ -80,6 +80,7 @@
     <string name="log_register_failure">createUserWithEmail:failure</string>
     <string name="log_return">return</string>
     <string name="log_document_error">Error getting documents</string>
+    <string name="log_user_moved">User Moved</string>
 
     ////// STRINGS RELATED TO TOOLBAR //////
     <string name="action_logout">LogOut</string>
