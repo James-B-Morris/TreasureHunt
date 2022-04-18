@@ -37,6 +37,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     // Map Object
     private lateinit var mMap: GoogleMap
 
+    /** The user's current location*/
+    private var currentLocation: LatLng? = null
+
     // gives access to the device's location
     private lateinit var mFusedLocationClient: FusedLocationProviderClient
 
@@ -59,6 +62,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             runnable?.let { handler.postDelayed(it, delay) }
             userCursor()
             Log.i(getString(R.string.log_login), getString(R.string.log_user_moved))
+            displayMessage(findViewById(R.id.map), currentLocation.toString())
         }.also { runnable = it }, delay)
     }
 
@@ -119,54 +123,41 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
-        var lastLoc = getLastLocation()
-
         mMap = googleMap
         mMap.uiSettings.isZoomControlsEnabled = true
         mMap.uiSettings.isCompassEnabled = true
         mMap.uiSettings.isMyLocationButtonEnabled = true
-        //mMap.setMaxZoomPreference(18F)
+        mMap.uiSettings.isMapToolbarEnabled = false // turns off google maps pop up when a pin is clicked
+        mMap.setMaxZoomPreference(20F)
         mMap.setMinZoomPreference(15F)
-
-
-        if (lastLoc != null) {
-            mMap.animateCamera(CameraUpdateFactory.newLatLng(lastLoc))
-            mMap.animateCamera(CameraUpdateFactory.zoomTo(15F))
-        }
+        mMap.animateCamera(CameraUpdateFactory.zoomTo(18F))
+        getLastLocation()
 
         //handle my location FAB
         val fabMy: View = findViewById(R.id.locFab)
         fabMy.setOnClickListener { view ->
-            lastLoc = getLastLocation()
-            if (lastLoc != null) {
-                mMap.animateCamera(CameraUpdateFactory.newLatLng(lastLoc!!))
-                mMap.animateCamera(CameraUpdateFactory.zoomTo(15F))
+            getLastLocation()
+            if (currentLocation != null) {
+                mMap.animateCamera(CameraUpdateFactory.newLatLng(currentLocation!!))
+                mMap.animateCamera(CameraUpdateFactory.zoomTo(18F))
             }
         }
     }
 
     private fun userCursor() {
-        val lastLoc = getLastLocation()
-        //mMap.clear()
+        getLastLocation()
+        mMap.clear()
 
-        if (lastLoc != null) {
-            mMap.clear()
-            //update camera
-            //mMap.animateCamera(CameraUpdateFactory.newLatLng(lastLoc))
-            //mMap.animateCamera(CameraUpdateFactory.zoomTo(15F))
+        if (currentLocation != null) {
+            mMap.animateCamera(CameraUpdateFactory.newLatLng(currentLocation!!))
             mMap.addMarker(
-                MarkerOptions().position(lastLoc)
+                MarkerOptions().position(currentLocation!!)
                     .title(getString(R.string.map_current_location))
             )
         }
-
-
     }
 
-    private fun getLastLocation() : LatLng? {
-        var lastLoc :LatLng?
-        lastLoc = null
-
+    private fun getLastLocation() {
         if(isLocationEnabled()) {
             //checking location permission
             if (ActivityCompat.checkSelfPermission(this,
@@ -174,7 +165,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 //request permission
                 ActivityCompat.requestPermissions(this,
                     arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 42)
-                return lastLoc
+                return
             }
 
             //once the last location is acquired
@@ -189,17 +180,16 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                     val long = location.longitude
 
                     Log.i(getString(R.string.log_map_loc), "$lat & $long")
-
-                    lastLoc = LatLng(lat, long)
-                    mMap.animateCamera(CameraUpdateFactory.newLatLng(lastLoc!!))
-                    //mMap.animateCamera(CameraUpdateFactory.zoomTo(15F))
-                    mMap.addMarker(
-                        MarkerOptions().position(lastLoc!!)
-                            .title(getString(R.string.map_current_location))
-                    )
+                    val lastLoc = LatLng(lat, long)
+                    if (lastLoc != currentLocation) {
+                        currentLocation = lastLoc
+                        Log.i(getString(R.string.log_map_loc), currentLocation.toString() + " NEW")
+                    }
+                    else { // if the location hasn't changed, request new location
+                        requestNewLocationData()
+                    }
                 }
             }
-            return lastLoc
             // couldn't get location, so go to Settings (may be deprecated)
         } else {
             val mRootView = findViewById<View>(R.id.map)
@@ -209,7 +199,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
             val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
             startActivity(intent)
-            return lastLoc
         }
     }
 
@@ -258,5 +247,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             getSystemService(Context.LOCATION_SERVICE) as LocationManager
         return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) ||
                 locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
+    }
+
+    // helper functions
+    private fun displayMessage(view : View, msg : String) {
+        val snackbar = Snackbar.make(view, msg, Snackbar.LENGTH_LONG)
+        snackbar.show()
     }
 }
