@@ -129,8 +129,7 @@ class RegisterActivity : AppCompatActivity() {
     private fun createAccount(username : String, email : String, password : String) {
         val newUser = hashMapOf(
             getString(R.string.db_users_admin) to false,
-            getString(R.string.db_users_name) to username,
-            getString(R.string.db_users_email) to email
+            getString(R.string.db_users_name) to username
         )
 
         // save user's authentication details

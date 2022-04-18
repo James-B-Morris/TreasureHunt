@@ -38,5 +38,15 @@
             android:clickable="true"
             android:contentDescription="@string/description_location"
             android:src="@android:drawable/ic_menu_mylocation" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/buryFab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|left"
+            android:layout_margin="15dp"
+            android:clickable="true"
+            android:contentDescription="@string/description_location"
+            android:src="@drawable/shovel_icon" />
     </FrameLayout>
 </androidx.appcompat.widget.LinearLayoutCompat>
